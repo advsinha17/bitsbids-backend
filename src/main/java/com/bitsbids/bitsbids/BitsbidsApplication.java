@@ -9,5 +9,4 @@ public class BitsbidsApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(BitsbidsApplication.class, args);
 	}
-
 }

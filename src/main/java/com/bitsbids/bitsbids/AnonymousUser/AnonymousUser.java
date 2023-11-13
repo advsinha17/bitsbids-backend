@@ -26,7 +26,7 @@ public class AnonymousUser {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "user_id", nullable = false, updatable = false)
+    @Column(name = "anon_user_id", nullable = false, updatable = false)
     private UUID anonUserId;
 
     @Column(name = "userId", nullable = false)

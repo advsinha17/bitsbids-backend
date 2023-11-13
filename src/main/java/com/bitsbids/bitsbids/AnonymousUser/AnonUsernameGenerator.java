@@ -2,12 +2,15 @@ package com.bitsbids.bitsbids.AnonymousUser;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Random;
 
+@Component
 public class AnonUsernameGenerator {
 
     private List<String> adjectives;

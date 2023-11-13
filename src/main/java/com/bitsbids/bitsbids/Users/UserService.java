@@ -46,9 +46,35 @@ public class UserService {
         existingUser.setLastName(newUserDetails.getLastName());
     }
 
+    public Optional<BigDecimal> getWalletBalance(UUID userId) {
+        return userRepository.findById(userId).map(User::getWalletBalance);
+    }
+
     @Transactional
-    public void deleteUser(UUID id) {
-        userRepository.deleteById(id);
+    public boolean updateWalletBalance(UUID userId, BigDecimal newBalance) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setWalletBalance(newBalance);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
+
+    @Transactional
+    public boolean deleteUser(UUID id) {
+        boolean exists = userRepository.existsById(id);
+        if (!exists) {
+            return false;
+        }
+
+        try {
+            userRepository.deleteById(id);
+            return !userRepository.existsById(id);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 }

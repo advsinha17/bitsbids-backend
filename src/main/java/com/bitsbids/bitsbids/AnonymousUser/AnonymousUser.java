@@ -19,8 +19,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "anonymous_users", uniqueConstraints = {
-        @UniqueConstraint(name = "unique_user_id", columnNames = { "userId" }),
-        @UniqueConstraint(name = "unique_user_name", columnNames = { "anonUsername" })
+        @UniqueConstraint(name = "unique_user_id", columnNames = { "user_id" }),
+        @UniqueConstraint(name = "unique_user_name", columnNames = { "anon_username" })
 })
 public class AnonymousUser {
     @Id
@@ -29,10 +29,10 @@ public class AnonymousUser {
     @Column(name = "anon_user_id", nullable = false, updatable = false)
     private UUID anonUserId;
 
-    @Column(name = "userId", nullable = false)
+    @Column(name = "user_id", nullable = false)
     private UUID userId;
 
-    @Column(name = "anonUsername", nullable = false)
+    @Column(name = "anon_username", nullable = false)
     private String anonUsername;
 
 }

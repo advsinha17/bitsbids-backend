@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AnonymousUserRepository extends JpaRepository<AnonymousUser, UUID> {
 
-    Optional<AnonymousUser> findByUserId(UUID userId);
+    Optional<AnonymousUser> findByUser_Id(UUID userId);
 
     Optional<AnonymousUser> findByAnonUsername(String anonUsername);
 }

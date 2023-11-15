@@ -75,7 +75,7 @@ public class Product {
     @Column(name = "last_updated_at")
     private LocalDateTime lastUpdatedAt;
 
-    private enum ProductStatus {
+    public enum ProductStatus {
         ACTIVE,
         UNSOLD,
         SOLD,

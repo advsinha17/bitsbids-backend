@@ -28,13 +28,20 @@ public class ProductService {
     }
     // some logic to be added when form/listeners added
 
-    public boolean updateProduct(Product existingProduct, Product newProduct) {
+    public boolean updateProduct(UUID existingProductId, Product newProduct) {
         try {
-            existingProduct.setCategories(newProduct.getCategories());
-            existingProduct.setMediaUrls(newProduct.getMediaUrls());
-            existingProduct.setProductDescription(newProduct.getProductDescription());
-            productRepository.save(existingProduct);
-            return true;
+            Optional<Product> optionalExistingProduct = productRepository.findById(existingProductId);
+
+            if (optionalExistingProduct.isPresent()) {
+                Product existingProduct = optionalExistingProduct.get();
+                existingProduct.setCategories(newProduct.getCategories());
+                existingProduct.setMediaUrls(newProduct.getMediaUrls());
+                existingProduct.setProductDescription(newProduct.getProductDescription());
+                productRepository.save(existingProduct);
+                return true;
+            } else {
+                return false;
+            }
         } catch (Exception e) {
             return false;
         }

@@ -27,7 +27,7 @@ public class AnonymousUserService {
     }
 
     public Optional<AnonymousUser> getAnonUserByUserId(UUID userId) {
-        return anonymousUserRepository.findByUser_Id(userId);
+        return anonymousUserRepository.findByUser_UserId(userId);
     }
 
     public Optional<AnonymousUser> getAnonUserByUsername(String anonUsername) {

@@ -12,4 +12,6 @@ public interface AnonymousUserRepository extends JpaRepository<AnonymousUser, UU
     Optional<AnonymousUser> findByUser_UserId(UUID userId);
 
     Optional<AnonymousUser> findByAnonUsername(String anonUsername);
+
+    boolean existsByAnonUsername(String anonUsername);
 }

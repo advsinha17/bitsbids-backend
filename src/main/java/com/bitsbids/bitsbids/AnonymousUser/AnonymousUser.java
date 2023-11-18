@@ -24,7 +24,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "anonymous_users", uniqueConstraints = {
-        @UniqueConstraint(name = "unique_user_id", columnNames = { "user_id" }),
         @UniqueConstraint(name = "unique_user_name", columnNames = { "anon_username" })
 })
 public class AnonymousUser {

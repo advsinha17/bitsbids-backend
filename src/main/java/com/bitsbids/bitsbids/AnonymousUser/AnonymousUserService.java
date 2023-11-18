@@ -7,6 +7,9 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.bitsbids.bitsbids.Users.User;
+import com.bitsbids.bitsbids.Users.UserService;
+
 import jakarta.transaction.Transactional;
 
 @Service
@@ -14,6 +17,9 @@ public class AnonymousUserService {
 
     @Autowired
     private AnonymousUserRepository anonymousUserRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private AnonUsernameGenerator anonUsernameGenerator;
@@ -34,17 +40,28 @@ public class AnonymousUserService {
         return anonymousUserRepository.findByAnonUsername(anonUsername);
     }
 
-    public AnonymousUser addAnonymousUser(AnonymousUser anonymousUser) {
-        String anonUsername;
-        Optional<AnonymousUser> existingUser;
+    private class AnonUserCreationException extends RuntimeException {
+        public AnonUserCreationException(String message) {
+            super(message);
+        }
+    }
 
-        do {
-            anonUsername = anonUsernameGenerator.generateUsername();
-            existingUser = anonymousUserRepository.findByAnonUsername(anonUsername);
-        } while (existingUser.isPresent());
+    public AnonymousUser addAnonymousUser(UUID userId) {
 
-        anonymousUser.setAnonUsername(anonUsername);
-        return anonymousUserRepository.save(anonymousUser);
+        Optional<User> userOptional = userService.getUserbyId(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            String anonUsername = anonUsernameGenerator.generateUsername();
+            while (anonymousUserRepository.existsByAnonUsername(anonUsername)) {
+                anonUsername = anonUsernameGenerator.generateUsername();
+            }
+            AnonymousUser newAnonymousUser = new AnonymousUser();
+            newAnonymousUser.setUser(user);
+            newAnonymousUser.setAnonUsername(anonUsername);
+            return anonymousUserRepository.save(newAnonymousUser);
+
+        }
+        throw new AnonUserCreationException("User not found with ID: " + userId);
     }
 
     @Transactional

@@ -11,20 +11,17 @@ import java.util.UUID;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.bitsbids.bitsbids.AnonymousUser.AnonymousUser;
+import com.bitsbids.bitsbids.Users.User;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -37,7 +34,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "products", uniqueConstraints = {
-        @UniqueConstraint(name = "unique_anon_seller_id", columnNames = { "anon_seller_id" })
+        @UniqueConstraint(name = "unique_anon_seller", columnNames = { "anon_seller" })
 })
 public class Product {
 
@@ -57,8 +54,12 @@ public class Product {
     private BigDecimal startingPrice;
 
     @ManyToOne
-    @JoinColumn(name = "anon_seller_id", referencedColumnName = "anon_user_id", nullable = false)
+    @JoinColumn(name = "anon_seller", referencedColumnName = "anon_user_id", nullable = false)
     private AnonymousUser anonymousSeller;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "latest_bid_amount")
     private BigDecimal latestBidAmount;
@@ -91,8 +92,18 @@ public class Product {
     @Column(name = "media_url")
     private List<String> mediaUrls = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "product_categories", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private Set<Category> categories = new HashSet<>();
+    public enum ProductCategory {
+        CLOTHING,
+        JEWELLERY,
+        EDUCATIONAL,
+        ROOM_ACCESSORIES,
+        ELECTRONICS,
+        SPORTS,
+        ESSENTIALS
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category")
+    private Set<ProductCategory> categories = new HashSet<>();
 
 }

@@ -7,12 +7,19 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.bitsbids.bitsbids.AnonymousUser.AnonymousUser;
+import com.bitsbids.bitsbids.AnonymousUser.AnonymousUserService;
+import com.bitsbids.bitsbids.Users.User;
+
 import jakarta.transaction.Transactional;
 
 @Service
 public class ProductService {
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private AnonymousUserService anonymousUserService;
 
     public List<Product> getActiveProducts() {
         return productRepository.findByProductStatus(Product.ProductStatus.ACTIVE);
@@ -23,8 +30,17 @@ public class ProductService {
     }
 
     public Product addNewProduct(Product product) {
+        User optionalUser = product.getUser();
+        UUID userId = optionalUser.getUserId();
+
+        AnonymousUser anonymousUser = createAnonymousUser(userId);
+        product.setAnonymousSeller(anonymousUser);
         productRepository.save(product);
         return product;
+    }
+
+    private AnonymousUser createAnonymousUser(UUID userId) {
+        return anonymousUserService.addAnonymousUser(userId);
     }
     // some logic to be added when form/listeners added
 
@@ -34,7 +50,6 @@ public class ProductService {
 
             if (optionalExistingProduct.isPresent()) {
                 Product existingProduct = optionalExistingProduct.get();
-                existingProduct.setCategories(newProduct.getCategories());
                 existingProduct.setMediaUrls(newProduct.getMediaUrls());
                 existingProduct.setProductDescription(newProduct.getProductDescription());
                 productRepository.save(existingProduct);
@@ -78,4 +93,5 @@ public class ProductService {
             return false;
         }
     }
+
 }

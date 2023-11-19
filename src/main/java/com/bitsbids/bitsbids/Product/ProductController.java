@@ -1,5 +1,6 @@
 package com.bitsbids.bitsbids.Product;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,12 +8,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/products")
 @CrossOrigin
 public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @GetMapping
+    public ResponseEntity<List<Product>> getActiveProducts() {
+        List<Product> products = productService.getActiveProducts();
+        return ResponseEntity.ok(products);
+    }
 
     @GetMapping("/{productId}")
     public ResponseEntity<Product> getProduct(@PathVariable UUID productId) {
@@ -21,13 +28,13 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/new-product")
+    @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
         Product createdProduct = productService.addNewProduct(product);
         return ResponseEntity.ok(createdProduct);
     }
 
-    @PostMapping("/{productId}/edit")
+    @PutMapping("/{productId}")
     public ResponseEntity<?> updateWalletBalance(@PathVariable UUID productId,
             @RequestBody Product newProduct) {
         boolean updateSuccess = productService.updateProduct(productId, newProduct);

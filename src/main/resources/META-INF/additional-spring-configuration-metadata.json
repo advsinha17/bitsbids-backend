@@ -11,14 +11,9 @@
       "description": "A description for 'jwt.expiration'"
     },
     {
-      "name": "app.baseUrl",
+      "name": "base.url",
       "type": "java.lang.String",
-      "description": "A description for 'app.baseUrl'"
-    },
-    {
-      "name": "baseUrl",
-      "type": "java.lang.String",
-      "description": "A description for 'baseUrl'"
+      "description": "A description for 'base.url'"
     }
   ]
 }

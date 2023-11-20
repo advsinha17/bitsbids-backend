@@ -25,10 +25,9 @@ import com.bitsbids.bitsbids.AnonymousUser.AnonymousUser;
 @AllArgsConstructor
 @NoArgsConstructor
 
-
 @Table(name = "bids", uniqueConstraints = {
-    @UniqueConstraint(name = "bid_id", columnNames = { "bid_id" }),
-    @UniqueConstraint(name = "bidder_anonymous_id", columnNames = { "bidder_anonymous_id" }),
+        @UniqueConstraint(name = "bid_id", columnNames = { "bid_id" }),
+        @UniqueConstraint(name = "bidder_anonymous_id", columnNames = { "bidder_anonymous_id" }),
 })
 
 public class Bids {

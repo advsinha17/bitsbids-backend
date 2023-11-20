@@ -21,9 +21,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 
 @Table(name = "bids", uniqueConstraints = {
-    @UniqueConstraint(name= "bid_id", columnNames = {"bid_id"}),
-    @UniqueConstraint(name= "conversation_id", columnNames = {"conversation_id"}),
-    @UniqueConstraint(name= "sender_anonymous_id", columnNames = {"sender_anonymous_id"}),
+        @UniqueConstraint(name = "bid_id", columnNames = { "bid_id" }),
+        @UniqueConstraint(name = "conversation_id", columnNames = { "conversation_id" }),
+        @UniqueConstraint(name = "sender_anonymous_id", columnNames = { "sender_anonymous_id" }),
 })
 
 public class Messages {
@@ -47,9 +47,9 @@ public class Messages {
     private Boolean isRead;
 
     @Column(name = "attachments", nullable = false)
-    private String attachments; 
+    private String attachments;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
-    
+
 }

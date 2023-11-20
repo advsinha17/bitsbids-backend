@@ -1,0 +1,24 @@
+{
+  "properties": [
+    {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "description": "A description for 'jwt.secret'"
+    },
+    {
+      "name": "jwt.expiration",
+      "type": "java.lang.String",
+      "description": "A description for 'jwt.expiration'"
+    },
+    {
+      "name": "app.baseUrl",
+      "type": "java.lang.String",
+      "description": "A description for 'app.baseUrl'"
+    },
+    {
+      "name": "baseUrl",
+      "type": "java.lang.String",
+      "description": "A description for 'baseUrl'"
+    }
+  ]
+}

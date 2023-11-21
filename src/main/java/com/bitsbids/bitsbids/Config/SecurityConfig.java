@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -18,6 +19,11 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 import com.bitsbids.bitsbids.Users.UserService;
 
@@ -46,29 +52,45 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/products").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/products").authenticated();
                     auth.requestMatchers("/api/auth/check").authenticated();
+                    auth.requestMatchers("/logout").authenticated();
                     auth.anyRequest().permitAll();
                 })
+                .sessionManagement(management -> management
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2Login(login -> login
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(this.oauth2UserService()))
                         .successHandler(new CustomAuthenticationSuccessHandler(userService, jwtUtilityService, baseUrl))
                         .failureHandler(new CustomAuthenticationFailureHandler()))
-                .sessionManagement(management -> management
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-        http.addFilterBefore(authenticationTokenFilter(),
-                UsernamePasswordAuthenticationFilter.class);
-
-        http.exceptionHandling(exception -> exception
-                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/oauth2/authorization/google")));
+                .addFilterBefore(authenticationTokenFilter(),
+                        UsernamePasswordAuthenticationFilter.class)
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler(new CustomLogoutHandler()))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(
+                                new LoginUrlAuthenticationEntryPoint("/oauth2/authorization/google")));
 
         return http.build();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of(baseUrl));
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
+        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", configuration);
+        return urlBasedCorsConfigurationSource;
     }
 
     private OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
@@ -87,4 +109,5 @@ public class SecurityConfig {
         };
 
     }
+
 }

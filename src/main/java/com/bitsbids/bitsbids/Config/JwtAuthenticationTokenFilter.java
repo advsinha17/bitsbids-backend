@@ -32,39 +32,34 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        try {
-            String jwtToken = extractJwtFromRequest(request);
-            if (jwtToken != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        String jwtToken = extractJwtFromRequest(request);
 
-                if (jwtUtilityService.validateToken(jwtToken)) {
-                    String email = jwtUtilityService.getEmailFromToken(jwtToken);
+        if (jwtToken != null && jwtUtilityService.validateToken(jwtToken)
+                && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                    Optional<User> userDetailsOptional = userService.getUserbyEmail(email);
+            String email = jwtUtilityService.getEmailFromToken(jwtToken);
+            Optional<User> userDetailsOptional = userService.getUserbyEmail(email);
 
-                    if (userDetailsOptional.isPresent()) {
-                        User userDetails = userDetailsOptional.get();
-                        List<SimpleGrantedAuthority> authorities = Collections
-                                .singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+            if (userDetailsOptional.isPresent()) {
+                User userDetails = userDetailsOptional.get();
+                List<SimpleGrantedAuthority> authorities = Collections
+                        .singletonList(new SimpleGrantedAuthority("ROLE_USER"));
 
-                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                                userDetails, null, authorities);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, authorities);
 
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                    }
-                }
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-
-            chain.doFilter(request, response);
-        } catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
         }
+
+        chain.doFilter(request, response);
     }
 
     private String extractJwtFromRequest(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("AUTH-TOKEN".equals(cookie.getName())) {
+                if ("AUTH-TOKEN".equals(cookie.getName()) && !"JSESSIONID".equals(cookie.getName())) {
                     return cookie.getValue();
                 }
             }

@@ -58,7 +58,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/products").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/products").authenticated();
-                    auth.requestMatchers("/api/auth/check").authenticated();
+                    auth.requestMatchers("/api/auth/check").permitAll();
                     auth.requestMatchers("/logout").authenticated();
                     auth.anyRequest().permitAll();
                 })

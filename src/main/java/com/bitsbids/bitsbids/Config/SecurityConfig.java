@@ -27,6 +27,8 @@ import java.util.List;
 
 import com.bitsbids.bitsbids.Users.UserService;
 
+// import jakarta.servlet.http.HttpServletResponse;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -40,13 +42,11 @@ public class SecurityConfig {
     @Autowired
     InMemoryClientRegistrationRepository clientRegistrationRepository;
 
+    @Autowired
+    private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+
     @Value("${base.url}")
     private String baseUrl;
-
-    @Bean
-    JwtAuthenticationTokenFilter authenticationTokenFilter() {
-        return new JwtAuthenticationTokenFilter();
-    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -60,6 +60,7 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.POST, "/products").authenticated();
                     auth.requestMatchers("/api/auth/check").permitAll();
                     auth.requestMatchers("/logout").authenticated();
+                    auth.requestMatchers("/user/me").authenticated();
                     auth.anyRequest().permitAll();
                 })
                 .sessionManagement(management -> management
@@ -69,7 +70,7 @@ public class SecurityConfig {
                                 .userService(this.oauth2UserService()))
                         .successHandler(new CustomAuthenticationSuccessHandler(userService, jwtUtilityService, baseUrl))
                         .failureHandler(new CustomAuthenticationFailureHandler()))
-                .addFilterBefore(authenticationTokenFilter(),
+                .addFilterBefore(jwtAuthenticationTokenFilter,
                         UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout
                         .logoutUrl("/logout")

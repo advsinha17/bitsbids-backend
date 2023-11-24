@@ -27,8 +27,6 @@ import java.util.List;
 
 import com.bitsbids.bitsbids.Users.UserService;
 
-// import jakarta.servlet.http.HttpServletResponse;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {

@@ -45,4 +45,10 @@ public class ProductController {
         }
     }
 
+    @PostMapping("/bulk")
+    public ResponseEntity<List<Product>> getProductsByIds(@RequestBody List<UUID> productIds) {
+        List<Product> products = productService.getProductsByIds(productIds);
+        return ResponseEntity.ok(products);
+    }
+
 }

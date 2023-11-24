@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.bitsbids.bitsbids.AnonymousUser.AnonymousUser;
 import com.bitsbids.bitsbids.AnonymousUser.AnonymousUserService;
+import com.bitsbids.bitsbids.ElasticSearch.ProductIndex;
+import com.bitsbids.bitsbids.ElasticSearch.ProductSearchRepository;
 import com.bitsbids.bitsbids.Users.User;
 
 import jakarta.transaction.Transactional;
@@ -17,6 +19,9 @@ import jakarta.transaction.Transactional;
 public class ProductService {
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private ProductSearchRepository productSearchRepository;
 
     @Autowired
     private AnonymousUserService anonymousUserService;
@@ -36,11 +41,18 @@ public class ProductService {
         AnonymousUser anonymousUser = createAnonymousUser(userId);
         product.setAnonymousSeller(anonymousUser);
         productRepository.save(product);
+
+        ProductIndex productIndex = convertToProductIndex(product);
+        productSearchRepository.save(productIndex);
         return product;
     }
 
     private AnonymousUser createAnonymousUser(UUID userId) {
         return anonymousUserService.addAnonymousUser(userId);
+    }
+
+    public List<Product> getProductsByIds(List<UUID> productIds) {
+        return productRepository.findByProductIdIn(productIds);
     }
     // some logic to be added when form/listeners added
 
@@ -92,6 +104,14 @@ public class ProductService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private ProductIndex convertToProductIndex(Product product) {
+        ProductIndex productIndex = new ProductIndex();
+        productIndex.setId(product.getProductId().toString());
+        productIndex.setName(product.getProductName());
+        productIndex.setDescription(product.getProductDescription());
+        return productIndex;
     }
 
 }

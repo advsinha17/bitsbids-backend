@@ -47,7 +47,6 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         String username = email.substring(0, 9);
 
         User user = new User();
-        user.setPhoneNumber("NOT_SET");
         user.setEmail(email);
         user.setFirstName(firstName);
         user.setLastName(lastName);

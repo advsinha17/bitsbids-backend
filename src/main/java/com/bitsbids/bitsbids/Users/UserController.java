@@ -1,6 +1,8 @@
 package com.bitsbids.bitsbids.Users;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +45,12 @@ public class UserController {
 
     @PostMapping("/{userId}/wallet")
     public ResponseEntity<?> updateWalletBalance(@PathVariable UUID userId, @RequestBody WalletUpdateRequest request) {
-        boolean updateSuccess = userService.updateWalletBalance(userId, request.getAmount());
-        if (updateSuccess) {
-            return ResponseEntity.ok().build();
+        BigDecimal newBalance = userService.updateWalletBalance(userId, request.getAmount());
+        if (newBalance != null) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("newBalance", newBalance);
+
+            return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.badRequest().body("Unable to update wallet balance.");
         }

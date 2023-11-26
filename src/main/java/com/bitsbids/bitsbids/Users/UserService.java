@@ -53,15 +53,16 @@ public class UserService {
     }
 
     @Transactional
-    public boolean updateWalletBalance(UUID userId, BigDecimal newBalance) {
+    public BigDecimal updateWalletBalance(UUID userId, BigDecimal amount) {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
+            BigDecimal newBalance = user.getWalletBalance().add(amount);
             user.setWalletBalance(newBalance);
             userRepository.save(user);
-            return true;
+            return newBalance;
         }
-        return false;
+        return null;
     }
 
     @Transactional

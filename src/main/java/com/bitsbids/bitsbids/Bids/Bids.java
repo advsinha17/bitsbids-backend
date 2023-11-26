@@ -6,8 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,17 +19,16 @@ import java.util.UUID;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.bitsbids.bitsbids.AnonymousUser.AnonymousUser;
+import com.bitsbids.bitsbids.Product.Product;
+import com.bitsbids.bitsbids.Users.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 
-@Table(name = "bids", uniqueConstraints = {
-        @UniqueConstraint(name = "bid_id", columnNames = { "bid_id" }),
-        @UniqueConstraint(name = "bidder_anonymous_id", columnNames = { "bidder_anonymous_id" }),
-})
-
+@Table(name = "bids")
 public class Bids {
     @Id
     @GeneratedValue(generator = "UUID")
@@ -37,21 +36,23 @@ public class Bids {
     @Column(name = "bid_id", nullable = false, updatable = false)
     private UUID bidID;
 
+    @OneToOne
+    @JoinColumn(name = "anon_bidder", referencedColumnName = "anon_user_id")
+    private AnonymousUser bidderAnonymous;
+
+    @JsonBackReference
     @ManyToOne
-    @JoinColumn(name = "anon_seller_id", referencedColumnName = "anon_user_id", nullable = false)
-    private AnonymousUser bidderAnonymousID;
+    @JoinColumn(name = "product", referencedColumnName = "product_id", nullable = false)
+    private Product product;
 
     @ManyToOne
-    @JoinColumn(name = "product_id", referencedColumnName = "product_id", nullable = false)
-    private AnonymousUser productID;
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "bid_amount", nullable = false)
     private BigDecimal bidAmount;
 
     @Column(name = "bid_time", nullable = false)
     private LocalDateTime bidTime;
-
-    @Column(name = "bid_status", nullable = false)
-    private String bidStatus;
 
 }

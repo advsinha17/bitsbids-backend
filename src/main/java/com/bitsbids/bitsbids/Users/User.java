@@ -45,4 +45,7 @@ public class User {
     @Column(name = "wallet_balance", precision = 19, scale = 4, columnDefinition = "DECIMAL(19, 4) DEFAULT 0.0000")
     private BigDecimal walletBalance;
 
+    @Column(name = "bid_amount", precision = 19, scale = 4, columnDefinition = "DECIMAL(19, 4) DEFAULT 0.0000")
+    private BigDecimal bidAmount;
+
 }

@@ -13,6 +13,7 @@ import org.hibernate.annotations.GenericGenerator;
 import com.bitsbids.bitsbids.AnonymousUser.AnonymousUser;
 import com.bitsbids.bitsbids.Bids.Bids;
 import com.bitsbids.bitsbids.Users.User;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -55,8 +56,9 @@ public class Product {
     @Column(name = "starting_price", nullable = false)
     private BigDecimal startingPrice;
 
+    @JsonManagedReference
     @OneToOne
-    @JoinColumn(name = "anon_seller", referencedColumnName = "anon_user_id", nullable = false)
+    @JoinColumn(name = "anon_seller", referencedColumnName = "anon_user_id", nullable = true)
     private AnonymousUser anonymousSeller;
 
     @ManyToOne

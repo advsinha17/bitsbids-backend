@@ -23,8 +23,12 @@ public class ProductService {
     @Autowired
     private ProductSearchRepository productSearchRepository;
 
-    @Autowired
     private AnonymousUserService anonymousUserService;
+
+    @Autowired
+    public void setAnonymousUserService(AnonymousUserService anonymousUserService) {
+        this.anonymousUserService = anonymousUserService;
+    }
 
     public List<Product> getActiveProducts() {
         return productRepository.findByProductStatus(Product.ProductStatus.ACTIVE);
@@ -35,21 +39,33 @@ public class ProductService {
     }
 
     public Product addNewProduct(Product product) {
-        User optionalUser = product.getUser();
-        UUID userId = optionalUser.getUserId();
+        User user = product.getUser();
+        UUID userId = user.getUserId();
 
-        AnonymousUser anonymousUser = createAnonymousUser(userId);
-        product.setAnonymousSeller(anonymousUser);
         product.setNumberOfBids(0);
+        product = productRepository.save(product);
+        AnonymousUser anonymousUser = createAnonymousUser(userId, AnonymousUser.UserRole.SELLER,
+                product.getProductId());
+        product.setAnonymousSeller(anonymousUser);
+
         productRepository.save(product);
 
         ProductIndex productIndex = convertToProductIndex(product);
         productSearchRepository.save(productIndex);
+
         return product;
     }
 
-    private AnonymousUser createAnonymousUser(UUID userId) {
-        return anonymousUserService.addAnonymousUser(userId);
+    private AnonymousUser createAnonymousUser(UUID userId, AnonymousUser.UserRole role, UUID productId) {
+        AnonymousUser anonUser = anonymousUserService.addAnonymousUser(userId, role);
+        Optional<Product> optProduct = getProductById(productId);
+        if (optProduct.isPresent()) {
+            Product product = optProduct.get();
+            anonUser.setProduct(product);
+            return anonymousUserService.saveAnonymousUser(anonUser);
+        }
+        throw new IllegalStateException("Product not found");
+
     }
 
     public List<Product> getProductsByIds(List<UUID> productIds) {

@@ -3,6 +3,7 @@ package com.bitsbids.bitsbids.AnonymousUser;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,13 @@ public class AnonymousUserService {
     @Autowired
     private UserService userService;
 
+    // private ProductService productService;
+
+    // @Autowired
+    // public void setProductService(ProductService productService) {
+    // this.productService = productService;
+    // }
+
     @Autowired
     private AnonUsernameGenerator anonUsernameGenerator;
 
@@ -32,12 +40,17 @@ public class AnonymousUserService {
         return anonymousUserRepository.findById(id);
     }
 
-    public Optional<AnonymousUser> getAnonUserByUserId(UUID userId) {
+    public List<AnonymousUser> getAnonUserByUserId(UUID userId) {
         return anonymousUserRepository.findByUser_UserId(userId);
     }
 
     public Optional<AnonymousUser> getAnonUserByUsername(String anonUsername) {
         return anonymousUserRepository.findByAnonUsername(anonUsername);
+    }
+
+    public Optional<AnonymousUser> findAnonUserForUserAndProduct(UUID userId, UUID productId,
+            AnonymousUser.UserRole role) {
+        return anonymousUserRepository.findByUser_UserIdAndProduct_ProductIdAndRole(userId, productId, role);
     }
 
     private class AnonUserCreationException extends RuntimeException {
@@ -46,22 +59,38 @@ public class AnonymousUserService {
         }
     }
 
-    public AnonymousUser addAnonymousUser(UUID userId) {
+    public List<UUID> getAnonIdsByRealUserId(UUID realUserId) {
+        List<AnonymousUser> anonymousUsers = anonymousUserRepository.findByUser_UserId(realUserId);
 
+        return anonymousUsers.stream()
+                .map(AnonymousUser::getAnonUserId)
+                .collect(Collectors.toList());
+    }
+
+    public AnonymousUser addAnonymousUser(UUID userId, AnonymousUser.UserRole role) {
         Optional<User> userOptional = userService.getUserbyId(userId);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            String anonUsername = anonUsernameGenerator.generateUsername();
-            while (anonymousUserRepository.existsByAnonUsername(anonUsername)) {
-                anonUsername = anonUsernameGenerator.generateUsername();
-            }
-            AnonymousUser newAnonymousUser = new AnonymousUser();
-            newAnonymousUser.setUser(user);
-            newAnonymousUser.setAnonUsername(anonUsername);
-            return anonymousUserRepository.save(newAnonymousUser);
-
+        if (!userOptional.isPresent()) {
+            throw new AnonUserCreationException("User not found with ID: " + userId);
         }
-        throw new AnonUserCreationException("User not found with ID: " + userId);
+        User user = userOptional.get();
+
+        String anonUsername = anonUsernameGenerator.generateUsername();
+        while (anonymousUserRepository.existsByAnonUsername(anonUsername)) {
+            anonUsername = anonUsernameGenerator.generateUsername();
+        }
+
+        AnonymousUser newAnonymousUser = new AnonymousUser();
+        newAnonymousUser.setUser(user);
+        newAnonymousUser.setAnonUsername(anonUsername);
+        newAnonymousUser.setRole(role);
+
+        return newAnonymousUser;
+
+        // return anonymousUserRepository.save(newAnonymousUser);
+    }
+
+    public AnonymousUser saveAnonymousUser(AnonymousUser anonymousUser) {
+        return anonymousUserRepository.save(anonymousUser);
     }
 
     @Transactional

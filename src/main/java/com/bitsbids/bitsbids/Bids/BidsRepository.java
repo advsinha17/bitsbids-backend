@@ -1,6 +1,7 @@
 package com.bitsbids.bitsbids.Bids;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,5 +24,6 @@ public interface BidsRepository extends JpaRepository<Bids, UUID> {
 
     List<Bids> findByUser_UserId(UUID userId);
 
-    // List<Bids> findByProduct_Id(UUID productId);
+    Optional<Bids> findTopByUserUserIdAndProductProductIdOrderByBidTimeDesc(UUID userId, UUID productId);
+
 }

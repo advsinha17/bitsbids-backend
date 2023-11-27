@@ -20,9 +20,7 @@ public class ElasticSearchProductController {
 
     @GetMapping("/search")
     public ResponseEntity<List<ProductIndex>> searchProducts(@RequestParam String query) {
-        // System.out.println(query);
         List<ProductIndex> products = productSearchRepository.searchByQuery(query);
-        // System.out.println(products);
         return ResponseEntity.ok(products);
     }
 }

@@ -59,6 +59,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         authCookie.setHttpOnly(true);
         authCookie.setSecure(request.isSecure());
         authCookie.setPath("/");
+        authCookie.setMaxAge(7 * 24 * 60 * 60);
         response.addCookie(authCookie);
 
         String redirectUrl = baseUrl + "/login/oauth2/code/google";

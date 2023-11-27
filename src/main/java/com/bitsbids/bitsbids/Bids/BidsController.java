@@ -1,5 +1,6 @@
 package com.bitsbids.bitsbids.Bids;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +22,33 @@ public class BidsController {
     private BidsService bidsService;
 
     @GetMapping("/{bidId}")
-    public ResponseEntity<Bids> getUser(@PathVariable UUID bidId) {
+    public ResponseEntity<Bids> getBid(@PathVariable UUID bidId) {
         return bidsService.getBidById(bidId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // @GetMapping("/{productId}")
+    // public ResponseEntity<?> getUsersLatestBid(@PathVariable UUID productId,
+    // @RequestBody User user) {
+    // return bidsService.getUserLatestBid()
+    // .map(ResponseEntity::ok)
+    // .orElse(ResponseEntity.notFound().build());
+    // }
+
+    @GetMapping("/latest/{productId}/{userId}")
+    public ResponseEntity<?> getLatestBidByUserOnProduct(@PathVariable UUID productId, @PathVariable UUID userId) {
+        Optional<Bids> latestBid = bidsService.getLatestBidByUserOnProduct(userId, productId);
+
+        if (latestBid.isPresent()) {
+            return ResponseEntity.ok(latestBid.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PostMapping("/create/{productId}")
     public ResponseEntity<?> createBid(@PathVariable UUID productId, @RequestBody Bids bid) {
-        System.out.println(productId);
-        System.out.println(bid);
         try {
             Bids createdBid = bidsService.addNewBid(productId, bid);
             return ResponseEntity.ok(createdBid);

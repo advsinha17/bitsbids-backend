@@ -13,6 +13,8 @@ import com.bitsbids.bitsbids.AnonymousUser.AnonymousUserService;
 import com.bitsbids.bitsbids.Product.Product;
 import com.bitsbids.bitsbids.Product.ProductService;
 import com.bitsbids.bitsbids.Users.User;
+import com.bitsbids.bitsbids.Users.UserService;
+import com.bitsbids.bitsbids.Users.UserService.InsufficientBalanceException;
 
 import jakarta.transaction.Transactional;
 
@@ -27,6 +29,9 @@ public class BidsService {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private UserService userService;
 
     public Optional<Bids> getBidById(UUID id) {
         return bidsRepository.findById(id);
@@ -58,8 +63,8 @@ public class BidsService {
 
     @Transactional
     public Bids addNewBid(UUID productId, Bids newBid) {
-        User optionalUser = newBid.getUser();
-        UUID userId = optionalUser.getUserId();
+        User user = newBid.getUser();
+        UUID userId = user.getUserId();
 
         AnonymousUser anonymousUser = createAnonymousUser(userId);
         newBid.setBidderAnonymous(anonymousUser);
@@ -76,6 +81,25 @@ public class BidsService {
             throw new RuntimeException("Bid amount must be higher than the current bid.");
         }
 
+        try {
+            userService.updateBidAmount(userId, newBid.getBidAmount());
+        } catch (InsufficientBalanceException e) {
+            throw new IllegalStateException(
+                    "Insufficient wallet balance. Your current total bids plus this new bid amount exceed your wallet balance. Please update your wallet balance to continue bidding.");
+        } catch (IllegalArgumentException e) {
+            throw new IllegalStateException("User not found.");
+        }
+
+        Bids oldBid = product.getLatestBid();
+        if (oldBid != null) {
+            User oldUser = oldBid.getUser();
+            try {
+                userService.decreaseBidAmount(oldUser.getUserId(), product.getLatestBidAmount());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalStateException("Old User not found.");
+            }
+        }
+        product.setNumberOfBids(product.getNumberOfBids() + 1);
         product.setLatestBidAmount(newBid.getBidAmount());
         product.setLatestBid(newBid);
         productService.updateProduct(productId, product);
@@ -83,6 +107,10 @@ public class BidsService {
         newBid.setProduct(product);
         bidsRepository.save(newBid);
         return newBid;
+    }
+
+    public Optional<Bids> getLatestBidByUserOnProduct(UUID userId, UUID productId) {
+        return bidsRepository.findTopByUserUserIdAndProductProductIdOrderByBidTimeDesc(userId, productId);
     }
 
     private AnonymousUser createAnonymousUser(UUID userId) {

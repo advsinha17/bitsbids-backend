@@ -60,6 +60,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/logout").authenticated();
                     auth.requestMatchers("/user/me").authenticated();
                     auth.requestMatchers("/search").permitAll();
+                    // auth.requestMatchers("/bid/**").permitAll();
                     auth.anyRequest().permitAll();
                 })
                 .sessionManagement(management -> management

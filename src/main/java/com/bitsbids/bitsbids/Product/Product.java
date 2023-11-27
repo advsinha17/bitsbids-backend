@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.bitsbids.bitsbids.AnonymousUser.AnonymousUser;
+import com.bitsbids.bitsbids.Bids.Bids;
 import com.bitsbids.bitsbids.Users.User;
 
 import jakarta.persistence.CollectionTable;
@@ -23,6 +24,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -53,7 +55,7 @@ public class Product {
     @Column(name = "starting_price", nullable = false)
     private BigDecimal startingPrice;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "anon_seller", referencedColumnName = "anon_user_id", nullable = false)
     private AnonymousUser anonymousSeller;
 
@@ -64,8 +66,9 @@ public class Product {
     @Column(name = "latest_bid_amount")
     private BigDecimal latestBidAmount;
 
-    @Column(name = "latest_bid_user")
-    private String latestBidUser;
+    @OneToOne
+    @JoinColumn(name = "latest_bid", referencedColumnName = "bid_id")
+    private Bids latestBid;
 
     @Column(name = "bid_closing_time", nullable = false)
     private LocalDateTime bidClosingTime;
@@ -78,6 +81,9 @@ public class Product {
 
     @Column(name = "product_quality")
     private String productQuality;
+
+    @Column(name = "number_of_bids", nullable = false)
+    private int numberOfBids;
 
     public enum ProductStatus {
         ACTIVE,

@@ -40,6 +40,7 @@ public class ProductService {
 
         AnonymousUser anonymousUser = createAnonymousUser(userId);
         product.setAnonymousSeller(anonymousUser);
+        product.setNumberOfBids(0);
         productRepository.save(product);
 
         ProductIndex productIndex = convertToProductIndex(product);
@@ -54,7 +55,6 @@ public class ProductService {
     public List<Product> getProductsByIds(List<UUID> productIds) {
         return productRepository.findByProductIdIn(productIds);
     }
-    // some logic to be added when form/listeners added
 
     public boolean updateProduct(UUID existingProductId, Product newProduct) {
         try {

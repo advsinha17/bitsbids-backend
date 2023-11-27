@@ -55,12 +55,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/products").permitAll();
-                    auth.requestMatchers(HttpMethod.POST, "/products").permitAll();
+                    auth.requestMatchers(HttpMethod.POST, "/products").authenticated();
                     auth.requestMatchers("/api/auth/check").permitAll();
                     auth.requestMatchers("/logout").authenticated();
                     auth.requestMatchers("/user/me").authenticated();
                     auth.requestMatchers("/search").permitAll();
-                    // auth.requestMatchers("/bid/**").permitAll();
+                    auth.requestMatchers("/bid/**").authenticated();
                     auth.anyRequest().permitAll();
                 })
                 .sessionManagement(management -> management

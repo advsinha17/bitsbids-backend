@@ -28,14 +28,6 @@ public class BidsController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // @GetMapping("/{productId}")
-    // public ResponseEntity<?> getUsersLatestBid(@PathVariable UUID productId,
-    // @RequestBody User user) {
-    // return bidsService.getUserLatestBid()
-    // .map(ResponseEntity::ok)
-    // .orElse(ResponseEntity.notFound().build());
-    // }
-
     @GetMapping("/latest/{productId}/{userId}")
     public ResponseEntity<?> getLatestBidByUserOnProduct(@PathVariable UUID productId, @PathVariable UUID userId) {
         Optional<Bids> latestBid = bidsService.getLatestBidByUserOnProduct(userId, productId);

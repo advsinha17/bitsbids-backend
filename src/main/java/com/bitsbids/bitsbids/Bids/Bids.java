@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,7 +35,7 @@ public class Bids {
     @Column(name = "bid_id", nullable = false, updatable = false)
     private UUID bidID;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "anon_bidder", referencedColumnName = "anon_user_id")
     private AnonymousUser bidderAnonymous;
 

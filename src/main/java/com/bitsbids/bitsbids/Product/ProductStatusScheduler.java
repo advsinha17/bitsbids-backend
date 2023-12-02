@@ -22,7 +22,7 @@ public class ProductStatusScheduler {
 
         for (Product product : allProducts) {
             if (product.getBidClosingTime().isBefore(now)) {
-                if (product.getLatestBidAmount() == null) {
+                if (product.getLatestBid() == null) {
                     product.setProductStatus(Product.ProductStatus.UNSOLD);
                 } else {
                     product.setProductStatus(Product.ProductStatus.SOLD);

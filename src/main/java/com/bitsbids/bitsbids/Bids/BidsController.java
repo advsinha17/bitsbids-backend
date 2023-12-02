@@ -35,7 +35,7 @@ public class BidsController {
         if (latestBid.isPresent()) {
             return ResponseEntity.ok(latestBid.get());
         } else {
-            return ResponseEntity.notFound().build();
+            return null;
         }
     }
 

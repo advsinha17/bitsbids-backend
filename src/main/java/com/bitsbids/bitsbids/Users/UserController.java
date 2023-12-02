@@ -56,6 +56,32 @@ public class UserController {
         }
     }
 
+    @PutMapping("/{userId}/info")
+    public ResponseEntity<?> updateUserContactInfo(
+            @PathVariable UUID userId,
+            @RequestBody Map<String, String> updateRequest) {
+        try {
+            String phoneNumber = updateRequest.get("phoneNo");
+            String hostel = updateRequest.get("hostel");
+
+            if (phoneNumber == null || phoneNumber.isEmpty() || hostel == null || hostel.isEmpty()) {
+                return ResponseEntity.badRequest().body("Phone number and hostel are required.");
+            }
+
+            boolean updateSuccess = userService.updateUserContactInfo(userId, phoneNumber, hostel);
+
+            if (updateSuccess) {
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @GetMapping("/me")
     public ResponseEntity<UUID> getCurrentAuthenticatedUser(Authentication authentication) {
         Object principal = authentication.getPrincipal();

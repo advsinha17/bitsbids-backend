@@ -68,8 +68,9 @@ public class SecurityConfig {
                 .oauth2Login(login -> login
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(this.oauth2UserService()))
-                        .successHandler(new CustomAuthenticationSuccessHandler(userService, jwtUtilityService, baseUrl))
-                        .failureHandler(new CustomAuthenticationFailureHandler()))
+                        .successHandler(
+                                new CustomAuthenticationSuccessHandler(userService, jwtUtilityService, baseUrl))
+                        .failureHandler(new CustomAuthenticationFailureHandler(baseUrl)))
                 .addFilterBefore(jwtAuthenticationTokenFilter,
                         UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout

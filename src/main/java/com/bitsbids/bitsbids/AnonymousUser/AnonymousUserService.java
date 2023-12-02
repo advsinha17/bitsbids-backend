@@ -22,13 +22,6 @@ public class AnonymousUserService {
     @Autowired
     private UserService userService;
 
-    // private ProductService productService;
-
-    // @Autowired
-    // public void setProductService(ProductService productService) {
-    // this.productService = productService;
-    // }
-
     @Autowired
     private AnonUsernameGenerator anonUsernameGenerator;
 

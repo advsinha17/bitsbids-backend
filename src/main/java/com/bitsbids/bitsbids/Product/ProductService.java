@@ -3,12 +3,15 @@ package com.bitsbids.bitsbids.Product;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bitsbids.bitsbids.AnonymousUser.AnonymousUser;
 import com.bitsbids.bitsbids.AnonymousUser.AnonymousUserService;
+import com.bitsbids.bitsbids.Bids.Bids;
+import com.bitsbids.bitsbids.Bids.BidsRepository;
 import com.bitsbids.bitsbids.ElasticSearch.ProductIndex;
 import com.bitsbids.bitsbids.ElasticSearch.ProductSearchRepository;
 import com.bitsbids.bitsbids.Users.User;
@@ -26,6 +29,9 @@ public class ProductService {
     private AnonymousUserService anonymousUserService;
 
     @Autowired
+    private BidsRepository bidsRepository;
+
+    @Autowired
     public void setAnonymousUserService(AnonymousUserService anonymousUserService) {
         this.anonymousUserService = anonymousUserService;
     }
@@ -36,6 +42,19 @@ public class ProductService {
 
     public Optional<Product> getProductById(UUID id) {
         return productRepository.findById(id);
+    }
+
+    public List<Product> getProductsByUserId(UUID userId) {
+        // Your repository should have a method to find products by user ID
+        return productRepository.findByUser_UserId(userId);
+    }
+
+    public List<Product> findAllProductsByIds(Iterable<UUID> productIds) {
+        return productRepository.findAllById(productIds);
+    }
+
+    public Product saveProduct(Product product) {
+        return productRepository.save(product);
     }
 
     public Product addNewProduct(Product product) {
@@ -54,6 +73,17 @@ public class ProductService {
         productSearchRepository.save(productIndex);
 
         return product;
+    }
+
+    public List<Product> findAllProductsForUserBids(UUID userId) {
+        List<Bids> userBids = bidsRepository.findByUser_UserId(userId);
+
+        List<UUID> productIds = userBids.stream()
+                .map(bid -> bid.getProduct().getProductId())
+                .distinct()
+                .collect(Collectors.toList());
+
+        return findAllProductsByIds(productIds);
     }
 
     private AnonymousUser createAnonymousUser(UUID userId, AnonymousUser.UserRole role, UUID productId) {

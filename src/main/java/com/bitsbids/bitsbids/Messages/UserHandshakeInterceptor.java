@@ -37,7 +37,6 @@ public class UserHandshakeInterceptor implements HandshakeInterceptor {
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
             WebSocketHandler wsHandler, Exception exception) {
-        // Post-handshake logic (usually left empty)
     }
 
     private String extractTokenFromRequest(ServerHttpRequest request) {

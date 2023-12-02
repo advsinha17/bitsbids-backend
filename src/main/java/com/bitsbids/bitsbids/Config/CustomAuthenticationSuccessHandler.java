@@ -51,6 +51,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setUsername(username);
+        user.setPhoneNo("NA");
+        user.setHostel("NA");
         userService.addOrUpdateUser(user);
 
         String jwtToken = jwtUtilityService.generateToken(email);

@@ -59,11 +59,28 @@ public class UserService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             BigDecimal newBalance = user.getWalletBalance().add(amount);
+            if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
+                throw new InsufficientBalanceException("Insufficient wallet balance.");
+            }
             user.setWalletBalance(newBalance);
             userRepository.save(user);
             return newBalance;
         }
-        return null;
+        throw new IllegalArgumentException("User not found.");
+    }
+
+    @Transactional
+    public boolean updateUserContactInfo(UUID userId, String phoneNumber, String hostel) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setPhoneNo(phoneNumber);
+            user.setHostel(hostel);
+            userRepository.save(user);
+            return true;
+        } else {
+            throw new IllegalArgumentException("User not found.");
+        }
     }
 
     @Transactional
@@ -89,6 +106,9 @@ public class UserService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             BigDecimal newBidAmount = user.getBidAmount().subtract(amount);
+            if (newBidAmount.compareTo(BigDecimal.ZERO) < 0) {
+                throw new IllegalArgumentException("Bid amount cannot be negative.");
+            }
             user.setBidAmount(newBidAmount);
             userRepository.save(user);
             return newBidAmount;

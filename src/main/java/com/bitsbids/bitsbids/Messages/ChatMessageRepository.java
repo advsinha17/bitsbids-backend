@@ -9,4 +9,9 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, UUID> 
     List<ChatMessage> findBySessionId(String sessionId);
 
     List<ChatMessage> findBySessionIdIn(Set<UUID> sessionIds);
+
+    ChatMessage findFirstBySessionIdOrderByTimestampDesc(String sessionId);
+
+    int countBySessionIdAndRecipient_User_UserIdAndIsReadFalse(String sessionId, UUID userId);
+
 }

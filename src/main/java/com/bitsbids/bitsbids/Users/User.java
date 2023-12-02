@@ -42,6 +42,12 @@ public class User {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    @Column(name = "phone_number")
+    private String phoneNo;
+
+    @Column(name = "hostel")
+    private String hostel;
+
     @Column(name = "wallet_balance", precision = 19, scale = 4, columnDefinition = "DECIMAL(19, 4) DEFAULT 0.0000")
     private BigDecimal walletBalance;
 

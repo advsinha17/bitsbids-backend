@@ -147,12 +147,13 @@ public class ChatService {
                 // Add other product fields as needed
             }
 
-            // Determine which username to display
             String receiverUsername;
             if (isProductSold && isLatestBidderMatching(session, product)) {
                 UUID actualBuyerId = (UUID) sessionDetail.get("actualBuyerId");
                 UUID actualSellerId = (UUID) sessionDetail.get("actualSellerId");
+                System.out.println(actualBuyerId);
                 receiverUsername = getRealUsername(session, realUserId, actualBuyerId, actualSellerId);
+                System.out.println(receiverUsername);
             } else {
                 UUID anonBuyerId = (UUID) sessionDetail.get("anonBuyerId");
                 UUID anonSellerId = (UUID) sessionDetail.get("anonSellerId");
